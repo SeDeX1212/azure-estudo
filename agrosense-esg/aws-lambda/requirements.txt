@@ -1,0 +1,2 @@
+# Sem dependências de runtime (apenas a biblioteca padrão do Python 3.12).
+# Testes: python -m unittest discover -s tests -v

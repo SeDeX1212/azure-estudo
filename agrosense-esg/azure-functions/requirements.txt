@@ -1,0 +1,2 @@
+azure-functions>=1.20.0
+# Testes: python -m unittest discover -s tests -v (os testes do gatilho HTTP exigem o pacote acima)
