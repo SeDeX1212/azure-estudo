@@ -1,6 +1,6 @@
 # Cloudflare Workers — alternativa à função do Google Cloud
 
-Mesma regra de negócio e mesmo contrato JSON de `google-functions` (emissões, árvores equivalentes, índice ESG 0–100). A resposta traz `provider: "Cloudflare Workers (substitui o Google Cloud)"`.
+Mesma regra de negócio e mesmo contrato JSON de `google-functions` (emissões, árvores equivalentes, índice ESG 0–100). A resposta traz `provider: "Cloudflare Workers"`.
 **Atenção acadêmica:** o enunciado pede AWS, Azure e Google Cloud. Use esta alternativa só com a aprovação do professor e registre a troca no relatório.
 
 ## Criar pelo painel web (dash.cloudflare.com)
@@ -9,7 +9,7 @@ Mesma regra de negócio e mesmo contrato JSON de `google-functions` (emissões, 
 3. Clique em **Edit code**, apague o código de exemplo, cole o conteúdo de `worker.js` e clique em **Deploy**.
 4. Em **Settings → Variables and Secrets → Add**, tipo **Text**, nome `ALLOWED_ORIGIN`, valor `http://localhost:8080` (depois acrescente a URL pública do frontend, separada por vírgula). Salve e implante.
 5. A URL aparece em **Settings → Domains & Routes** (`https://agrosense-carbono.<subdominio>.workers.dev`). Copie para `frontend-app/config.js` (`endpoints.google`).
-6. Opcional: em `config.js` adicione `providerLabels: { google: "Cloudflare Workers" }`.
+6. No `config.js`, a URL vai em `endpoints.cloudflare`.
 
 ## Testar
 ```bash

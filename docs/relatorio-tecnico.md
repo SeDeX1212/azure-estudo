@@ -7,20 +7,20 @@ title: "AgroSense ESG — Relatório Técnico"
 **Integrantes:** ______  **Professor(a):** ______  **Data:** ______
 
 ## 1. Introdução e objetivos
-Construir uma aplicação web que integra três funções serverless em AWS, Azure e Google Cloud, consumidas por um frontend estático via HTTP/REST/JSON, demonstrando integração multicloud, resiliência, CORS, medição de latência e análise de custos.
+Construir uma aplicação web que integra três funções serverless em AWS, Azure e Cloudflare Workers (no lugar do Google Cloud do enunciado; substituição a confirmar com o professor), consumidas por um frontend estático via HTTP/REST/JSON, demonstrando integração multicloud, resiliência, CORS, medição de latência e análise de custos.
 
 ## 2. Problema de negócio
 Produtores precisam decidir quanto irrigar, quanto isso custa e qual o impacto de carbono. O sistema oferece uma **simulação** integrada dessas três dimensões.
 
 ## 3. Arquitetura multicloud
-Fluxo: usuário → frontend hospedado → AWS Lambda → Azure Functions → Google Cloud Run Functions → dashboard. Diagrama Mermaid em `docs/arquitetura.md` (exportar como imagem para este PDF). O frontend orquestra a sequência; nenhuma função depende de outra diretamente.
+Fluxo: usuário → frontend hospedado → AWS Lambda → Azure Functions → Cloudflare Workers → dashboard. Diagrama Mermaid em `docs/arquitetura.md` (exportar como imagem para este PDF). O frontend orquestra a sequência; nenhuma função depende de outra diretamente.
 
 ## 4. Funções serverless
 | Função | Provedor | Runtime | Gatilho |
 |---|---|---|---|
 | Avaliador hídrico | AWS Lambda | Python 3.12 | Function URL (ou API Gateway) |
 | Custo energético/hídrico | Azure Functions | Python 3.12 (modelo v2) | HTTP `/api/custo` |
-| Carbono e ESG | Google Cloud Run Functions | Python 3.12 | HTTP |
+| Carbono e ESG | Cloudflare Workers | JavaScript (módulo ES) | HTTP (fetch handler) |
 
 ## 5. Endpoints e JSON
 Ver `docs/endpoints.md` (payloads de entrada, respostas, erros). URLs reais: ______ (preencher após o deploy).
@@ -32,7 +32,7 @@ Ver `docs/endpoints.md` (payloads de entrada, respostas, erros). URLs reais: ___
 - Todos os parâmetros são didáticos, não científicos, e aparecem no topo dos códigos.
 
 ## 7. CORS e segurança
-AWS e Google: cabeçalhos `Access-Control-*` no código, controlados por `ALLOWED_ORIGIN`; Azure: CORS da plataforma. Preflight `OPTIONS` → 204. Endpoints anônimos são aceitáveis apenas na atividade (riscos: abuso, custo, ausência de autenticação). Sem segredos no frontend ou repositório.
+AWS e Cloudflare: cabeçalhos `Access-Control-*` no código, controlados por `ALLOWED_ORIGIN`; Azure: CORS da plataforma. Preflight `OPTIONS` → 204. Endpoints anônimos são aceitáveis apenas na atividade (riscos: abuso, custo, ausência de autenticação). Sem segredos no frontend ou repositório.
 
 ## 8. Tratamento de erros e fallback
 `try/catch`, `AbortController` por chamada (`timeoutMs`), classificação (config, rede/CORS, timeout, HTTP, resposta inválida), estados por módulo (Aguardando/Processando/Concluído/Erro/Bloqueado), preservação de resultados, retry por módulo. Modo "simulação local" explicitamente rotulado como não-nuvem.
@@ -44,7 +44,7 @@ Ver `docs/testes.md`: 34 testes automatizados (Python `unittest` e Node `node:te
 Tabela em `docs/metricas.md` (preencher com medições). Cold e warm start dependem de provedor, plano, memória, runtime, região e ociosidade; nenhum valor é assumido neste relatório.
 
 ## 11. Comparação dos consoles e serviços
-| Critério | AWS | Azure | Google Cloud |
+| Critério | AWS | Azure | Cloudflare |
 |---|---|---|---|
 | Criação da função | ______ | ______ | ______ |
 | Configuração de URL/CORS | ______ | ______ | ______ |
@@ -59,7 +59,7 @@ Modelo, hipóteses e fórmulas em `docs/metricas.md`; valores a preencher com os
 ______ (síntese do grupo: o que funcionou, dificuldades, limitações, melhorias — autenticação, orquestrador, observabilidade, IaC).
 
 ## 14. Referências técnicas oficiais
-Consultar e citar (com data de acesso): documentação do AWS Lambda (Function URLs, Python runtime, pricing); Azure Functions (Python v2, HTTP trigger, CORS, pricing); Google Cloud Run functions (Python, deploy, pricing); MDN (Fetch API, AbortController, CORS).
+Consultar e citar (com data de acesso): documentação do AWS Lambda (Function URLs, Python runtime, pricing); Azure Functions (Python v2, HTTP trigger, CORS, pricing); Cloudflare Workers (dashboard, limits, pricing); MDN (Fetch API, AbortController, CORS).
 
 ---
 **Converter para PDF:** `pandoc docs/relatorio-tecnico.md -o relatorio.pdf` (ou abra no VS Code/Typora e exporte). Para o diagrama: `npx @mermaid-js/mermaid-cli -i docs/arquitetura.md` ou cole o bloco em mermaid.live e exporte PNG.

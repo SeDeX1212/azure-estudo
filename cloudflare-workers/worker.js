@@ -2,7 +2,7 @@
  * Mesma regra de negócio e mesmo contrato JSON de google-functions/esg.py.
  * Modelo ACADÊMICO e demonstrativo: não é medição científica, crédito de carbono nem certificação ESG.
  * CORS: variável ALLOWED_ORIGIN (lista separada por vírgulas; padrão "*" só para desenvolvimento). */
- 
+
 // ============ PARÂMETROS DEMONSTRATIVOS (ajustáveis) ============
 const DEFAULT_ABSORPTION = 20.0;      // kg CO2e por árvore por ano (varia com espécie, clima, idade, período)
 const REF_CARBON_INTENSITY = 50.0;    // kg CO2e/ha que zera a nota de carbono
@@ -13,9 +13,9 @@ const CLASSES = [[80, 'Excelente'], [60, 'Boa'], [40, 'Moderada'], [0, 'Crítica
 const PROVIDER = 'Cloudflare Workers';
 const LIMITATIONS = 'O fator de emissão da eletricidade depende da matriz energética e do período adotados. A absorção de carbono por árvores varia com espécie, clima, idade e tempo considerado. Árvores equivalentes não são créditos de carbono certificados.';
 const DISCLAIMER = 'Indicadores estimados para fins educacionais, sem certificação ambiental.';
- 
+
 class ValidationError extends Error {}
- 
+
 function num(p, field, min, max, { required = true, def = null, positive = false } = {}) {
   const v = p[field];
   if (v === undefined || v === null) { if (required) throw new ValidationError(`Campo obrigatório ausente: ${field}.`); return def; }
@@ -35,7 +35,7 @@ function validate(p) {
 const r2 = (x) => Math.round(x * 100) / 100;
 const r1 = (x) => Math.round(x * 10) / 10;
 const classify = (i) => CLASSES.find(([f]) => i >= f)[1];
- 
+
 function calcular(payload) {
   const d = validate(payload);
   const emissions = d.energy * d.factor, ha = d.area / 10000, treesExact = emissions / d.absorption;
@@ -56,7 +56,7 @@ function calcular(payload) {
     disclaimer: DISCLAIMER,
   };
 }
- 
+
 function corsHeaders(origin, env) {
   const allowed = String((env && env.ALLOWED_ORIGIN) || '*').split(',').map((s) => s.trim()).filter(Boolean);
   const h = { 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Max-Age': '3600' };
@@ -69,7 +69,7 @@ function reply(status, body, origin, env) {
 }
 const fail = (status, code, message, origin, env) =>
   reply(status, { success: false, provider: PROVIDER, service: 'carbon_esg', error: { code, message } }, origin, env);
- 
+
 async function handle(request, env) {
   const origin = request.headers.get('Origin');
   if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders(origin, env) });
@@ -83,6 +83,5 @@ async function handle(request, env) {
     return fail(500, 'INTERNAL_ERROR', 'Erro interno ao calcular carbono e ESG.', origin, env);
   }
 }
- 
+
 export default { fetch: handle, calcular, ValidationError }; // extras usados só nos testes
- 

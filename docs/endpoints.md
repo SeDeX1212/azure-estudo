@@ -1,6 +1,6 @@
 # Endpoints, payloads e exemplos
 
-Todos: `POST`, `Content-Type: application/json`. Erros: `{"success":false,"provider":"…","service":"…","error":{"code":"VALIDATION_ERROR|INVALID_JSON|METHOD_NOT_ALLOWED|INTERNAL_ERROR","message":"…"}}`. Substitua `$AWS_URL`, `$AZURE_URL`, `$GCP_URL` pelas URLs reais.
+Todos: `POST`, `Content-Type: application/json`. Erros: `{"success":false,"provider":"…","service":"…","error":{"code":"VALIDATION_ERROR|INVALID_JSON|METHOD_NOT_ALLOWED|INTERNAL_ERROR","message":"…"}}`. Substitua `$AWS_URL`, `$AZURE_URL`, `$CF_URL` pelas URLs reais.
 
 ## AWS — irrigação
 ```bash
@@ -23,9 +23,9 @@ curl -s -X POST "$AZURE_URL" -H "Content-Type: application/json" -d '{"water_lit
 ```
 Com `water_liters` = 8500 (verificado nos testes): energia 6,6 kWh (ponta 2,2 / fora 4,4), R$ 2,64 + R$ 2,86 = R$ 5,50; água 8,5 m³ = R$ 42,50; total **R$ 48,00**. Com 10 587,5 L a água custa R$ 52,94.
 
-## Google — carbono e ESG
+## Cloudflare Workers — carbono e ESG
 ```bash
-curl -s -X POST "$GCP_URL" -H "Content-Type: application/json" -d '{"energy_kwh":6.6,"planted_area_m2":1000,"carbon_factor_kg_per_kwh":0.08}'
+curl -s -X POST "$CF_URL" -H "Content-Type: application/json" -d '{"energy_kwh":6.6,"planted_area_m2":1000,"carbon_factor_kg_per_kwh":0.08}'
 ```
 Resposta resumida (verificada nos testes): `estimated_emissions_kg_co2e` 0,53; `planted_area_hectares` 0,1; `estimated_trees_equivalent` 1 (absorção 20 kg/árvore/ano); `esg.index` 82,7 → "Excelente" (nota carbono 89,4; nota energia 67,0). Campo opcional: `absorption_kg_per_tree_year`.
 

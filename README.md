@@ -2,11 +2,13 @@
 
 SaaS acadêmico multicloud (Serverless + Frontend) da disciplina **Computação em Nuvem I — Fatec Itapira**. Grupo E — Smart Agro & Sustentabilidade.
 
+**Nota:** o terceiro serviço usa **Cloudflare Workers** no lugar do Google Cloud pedido no enunciado (decisão a confirmar com o professor). A versão original em Python para o Google está em `google-functions/`.
+
 O usuário informa dados **simulados** de sensores e da operação; o frontend encadeia três funções independentes em nuvens diferentes e exibe tudo em um dashboard.
 
 ## Arquitetura
 ```
-Usuário → Frontend estático (PaaS) → AWS Lambda (irrigação) → Azure Functions (custos) → Google Cloud Run Functions (carbono/ESG) → Dashboard
+Usuário → Frontend estático (PaaS) → AWS Lambda (irrigação) → Azure Functions (custos) → Cloudflare Workers (carbono/ESG) → Dashboard
 ```
 Detalhes e diagrama Mermaid: [`docs/arquitetura.md`](docs/arquitetura.md).
 
@@ -17,7 +19,9 @@ Integrar FaaS de três provedores via HTTP/REST/JSON; tratar CORS, timeouts e fa
 ```
 aws-lambda/        lambda_function.py, tests/, README (deploy)
 azure-functions/   function_app.py (adaptador), custo.py (regras), host.json, local.settings.example.json, tests/
-google-functions/  main.py (adaptador), esg.py (regras), tests/
+azure-swa/         alternativa gratuita: a mesma função como API do Azure Static Web Apps (para assinatura de teste gratuito)
+cloudflare-workers/ worker.js (3º serviço), tests/
+google-functions/  implementação original em Python, não usada no deploy atual (substituída pela Cloudflare)
 frontend-app/      index.html, styles.css, app.js, config.example.js, config.js, tests/pipeline.test.js
 docs/              arquitetura, endpoints, testes, métricas, apresentação, relatório técnico
 ```
@@ -28,7 +32,7 @@ Arquivos além dos exigidos: `custo.py` e `esg.py` (lógica pura, testável sem 
 |---|---|---|---|
 | AWS Lambda | Necessidade hídrica | umidade, temperatura, cultura, área | L/m², litros totais, nível |
 | Azure Functions | Custo energético e hídrico | litros, potência, horas, tarifas | kWh, custos, total (BRL) |
-| Google Cloud Run Functions | Carbono e ESG | kWh, área, fator de emissão | kg CO₂e, árvores equivalentes, índice 0–100 |
+| Cloudflare Workers (no lugar do Google Cloud) | Carbono e ESG | kWh, área, fator de emissão | kg CO₂e, árvores equivalentes, índice 0–100 |
 
 Exemplos de payload e `curl`/PowerShell: [`docs/endpoints.md`](docs/endpoints.md).
 
@@ -36,12 +40,13 @@ Exemplos de payload e `curl`/PowerShell: [`docs/endpoints.md`](docs/endpoints.md
 **Testes** (Python 3.12 e Node 18+, sem dependências extras):
 ```bash
 for d in aws-lambda azure-functions google-functions; do (cd $d && python -m unittest discover -s tests); done
+(cd cloudflare-workers && node --test tests/worker.test.mjs)
 (cd frontend-app && node --test tests/pipeline.test.js)
 ```
 **Frontend local:** `cd frontend-app && cp config.example.js config.js && python -m http.server 8080` → http://localhost:8080 (use "Simulação local" enquanto não houver endpoints).
 
 ## Deploy (ordem sugerida)
-1. [`aws-lambda/README.md`](aws-lambda/README.md) · 2. [`azure-functions/README.md`](azure-functions/README.md) · 3. [`google-functions/README.md`](google-functions/README.md) · 4. Preencher `frontend-app/config.js` · 5. [`frontend-app/README.md`](frontend-app/README.md) (publicar) · 6. Incluir a URL pública no CORS das três funções · 7. Testar a URL pública e a resiliência.
+1. [`aws-lambda/README.md`](aws-lambda/README.md) · 2. [`azure-functions/README.md`](azure-functions/README.md) · 3. [`cloudflare-workers/README.md`](cloudflare-workers/README.md) · 4. Preencher `frontend-app/config.js` · 5. [`frontend-app/README.md`](frontend-app/README.md) (publicar) · 6. Incluir a URL pública no CORS das três funções · 7. Testar a URL pública e a resiliência.
 
 Pré-requisitos e custos: cada nuvem exige conta própria; não presuma créditos gratuitos. Confira preços e franquias nas páginas oficiais.
 
@@ -51,7 +56,7 @@ Pré-requisitos e custos: cada nuvem exige conta própria; não presuma crédito
 | Frontend | |
 | AWS Lambda | |
 | Azure Functions | |
-| Google Cloud Run Functions | |
+| Cloudflare Workers | |
 
 ## Integrantes (preencher)
 | Nome | RA |
@@ -60,7 +65,7 @@ Pré-requisitos e custos: cada nuvem exige conta própria; não presuma crédito
 
 ## Segurança e limitações
 - Endpoints **públicos/anônimos** servem apenas ao teste acadêmico: qualquer um com a URL pode chamá-los e gerar custo. Produção exigiria autenticação (IAM/Cognito, chaves de função, IAM do Cloud Run), WAF/limites de taxa e alarmes de orçamento.
-- CORS restringe navegadores, **não** autentica clientes. Defina `ALLOWED_ORIGIN` (AWS/Google) e o CORS da plataforma (Azure) com as origens exatas; `*` só em desenvolvimento.
+- CORS restringe navegadores, **não** autentica clientes. Defina `ALLOWED_ORIGIN` (AWS/Cloudflare) e o CORS da plataforma (Azure) com as origens exatas; `*` só em desenvolvimento.
 - Sem segredos no repositório; logs sem dados do usuário.
 - Modelos **demonstrativos**: parâmetros agronômicos, tarifas e índice ESG são simulados, não validados cientificamente nem certificados; árvores equivalentes não são créditos de carbono.
 - A orquestração no cliente é uma escolha didática; em produção usaria-se um orquestrador/backend.

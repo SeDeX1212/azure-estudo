@@ -7,7 +7,7 @@ flowchart LR
   A -->|total_water_liters| F
   F -->|2. POST JSON + litros| Z[Azure Functions<br/>custos]
   Z -->|total_kwh| F
-  F -->|3. POST JSON + kWh| G[Google Cloud Run Functions<br/>carbono e ESG]
+  F -->|3. POST JSON + kWh| G[Cloudflare Workers<br/>carbono e ESG]
   G --> F
   F --> D[Dashboard consolidado]
 ```
@@ -19,13 +19,13 @@ flowchart LR
 |---|---|---|
 | AWS | — | `irrigation.total_water_liters` |
 | Azure | `water_liters` | `energy.total_kwh` |
-| Google | `energy_kwh` | indicadores finais |
+| Cloudflare | `energy_kwh` | indicadores finais |
 
 ## Estados e resiliência
 Cada módulo: Aguardando → Processando → Concluído | Erro | Bloqueado por dependência. Falha no passo *n* bloqueia os dependentes sem exibir valores; resultados anteriores permanecem; "Tentar novamente" reexecuta do módulo falho em diante.
 
 ## Decisões técnicas
 - Python 3.12 nas três funções; lógica pura separada do adaptador (`custo.py`, `esg.py`) para testes sem SDKs.
-- CORS no código (AWS, Google) e na plataforma (Azure) — nunca nos dois ao mesmo tempo no mesmo provedor.
+- CORS no código (AWS, Cloudflare) e na plataforma (Azure) — nunca nos dois ao mesmo tempo no mesmo provedor.
 - Endpoints anônimos apenas para a atividade; veja riscos em `README.md`.
 - Sem bibliotecas de gráficos: barras, rosca (`conic-gradient`) e escala ESG em CSS.

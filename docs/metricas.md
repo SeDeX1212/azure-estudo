@@ -6,13 +6,13 @@ Nenhum valor foi medido ainda. Registre o tempo exibido em cada card (ms, medido
 |---|---|---|---|---|---|---|---|
 | AWS Lambda | | | | | | | |
 | Azure Functions | | | | | | | |
-| Google Cloud Run Functions | | | | | | | |
+| Cloudflare Workers | | | | | | | |
 | Cadeia completa (soma + frontend) | — | — | | | | | |
 
 ## Estimativa de custo — 1 milhão de requisições/mês (modelo; **preencher com preços oficiais vigentes**)
 Hipóteses a registrar: 1 000 000 invocações/mês por função; duração média = ____ ms (medida acima); memória = ____ MB; sem tráfego de saída relevante (respostas < 2 KB); logs mínimos.
 
-| Componente | Fórmula | AWS Lambda | Azure Functions (Consumption/Flex) | Google Cloud Run Functions |
+| Componente | Fórmula | AWS Lambda | Azure Functions (Consumption/Flex) | Cloudflare Workers |
 |---|---|---|---|---|
 | Requisições | (invocações − franquia gratuita) × preço por milhão | | | |
 | Computação | invocações × duração(s) × memória(GB) × preço por GB‑s (menos franquia) | | | |
