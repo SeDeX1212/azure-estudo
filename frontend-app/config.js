@@ -3,7 +3,7 @@
 window.AGROSENSE_CONFIG = {
   endpoints: {
     aws: "https://nwfht26jqvjpunsqjjolmvbxzm0kexzn.lambda-url.us-east-2.on.aws/",    // ex.: URL da Function URL da Lambda (https://<id>.lambda-url.<regiao>.on.aws/)
-    azure: "",  // ex.: https://<function-app>.azurewebsites.net/api/custo
+    azure: "https://yellow-moss-0f4850210.8.azurestaticapps.net/api/custo",  // ex.: https://<function-app>.azurewebsites.net/api/custo
     cloudflare: "https://agrosense-carbono.paulojorgelemosilva.workers.dev/"  // ex.: https://agrosense-carbono.<seu-subdominio>.workers.dev
   },
   timeoutMs: 15000 // tempo limite por chamada (cold start pode levar alguns segundos)
